@@ -296,4 +296,12 @@ public interface LoaderOptionsStep<R extends TableRecord<R>> extends LoaderSourc
      */
     @Support
     LoaderOptionsStep<R> bulkAfter(int number);
+
+    /**
+     * Write a log message after a specified number of batches or bulks.
+     * e.g. bulkAfter(1000).logAfter(4) means a log will be generated after
+     * 4K records have been loaded.
+     */
+    @Support
+    LoaderOptionsStep<R> logAfter(int number);
 }

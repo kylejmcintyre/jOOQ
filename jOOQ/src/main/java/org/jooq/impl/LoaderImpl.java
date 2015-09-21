@@ -81,6 +81,7 @@ import org.jooq.Table;
 import org.jooq.TableRecord;
 import org.jooq.exception.DataAccessException;
 import org.jooq.exception.LoaderConfigurationException;
+import org.jooq.tools.JooqLogger;
 import org.jooq.tools.StringUtils;
 import org.jooq.tools.csv.CSVParser;
 import org.jooq.tools.csv.CSVReader;
@@ -92,7 +93,6 @@ import org.xml.sax.InputSource;
  * @author Johannes Bühler
  */
 class LoaderImpl<R extends TableRecord<R>> implements
-
     // Cascading interface implementations for Loader behaviour
     LoaderOptionsStep<R>,
     LoaderXMLStep<R>,
@@ -101,6 +101,8 @@ class LoaderImpl<R extends TableRecord<R>> implements
     LoaderJSONStep<R>,
     LoaderJSONOptionsStep<R>,
     Loader<R> {
+
+    private static final JooqLogger log = JooqLogger.getLogger(LoaderImpl.class);
 
     // Configuration constants
     // -----------------------
@@ -142,6 +144,7 @@ class LoaderImpl<R extends TableRecord<R>> implements
     private int                     bulkAfter               = 1;
     private int                     content                 = CONTENT_CSV;
     private BufferedReader          data;
+    private int                     logAfter                = 0;
 
     // CSV configuration data
     // ----------------------
@@ -253,6 +256,12 @@ class LoaderImpl<R extends TableRecord<R>> implements
     public final LoaderImpl<R> batchAfter(int number) {
         batch = BATCH_AFTER;
         batchAfter = number;
+        return this;
+    }
+
+    @Override
+    public final LoaderImpl<R> logAfter(int number) {
+        logAfter = number;
         return this;
     }
 
@@ -653,6 +662,9 @@ class LoaderImpl<R extends TableRecord<R>> implements
                             if (batch == BATCH_ALL || processed % (bulkAfter * batchAfter) != 0)
                                 continue rows;
                         }
+
+                        if (logAfter > 0 && (processed / (bulkAfter * batchAfter)) % logAfter == 0)
+                            log.info(processed + " records processed");
 
                         if (bind != null)
                             bind.execute();
