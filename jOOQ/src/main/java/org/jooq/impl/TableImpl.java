@@ -70,8 +70,8 @@ public class TableImpl<R extends Record> extends AbstractTable<R> {
     private static final Clause[] CLAUSES_TABLE_REFERENCE = { TABLE, TABLE_REFERENCE };
     private static final Clause[] CLAUSES_TABLE_ALIAS     = { TABLE, TABLE_ALIAS };
 
-    final Fields<R>               fields;
-    final Alias<Table<R>>         alias;
+    final Fields<R>       fields;
+    final Alias<Table<R>> alias;
 
     protected final Field<?>[]    parameters;
 
@@ -128,7 +128,7 @@ public class TableImpl<R extends Record> extends AbstractTable<R> {
     }
 
     @Override
-    public final void accept(Context<?> ctx) {
+    public void accept(Context<?> ctx) {
         if (alias != null) {
             alias.accept(ctx);
         }
